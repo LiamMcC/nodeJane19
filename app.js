@@ -3,6 +3,9 @@ var express = require("express"); // This line calls the express framework to ac
 var app = express();
 // *********** Never write anything above the express call line ****************
 app.set("view engine", "ejs");  // set default view engine
+var fs = require('fs');
+var bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({extended:true}));
 
 var contact = require("./model/contact.json"); // This declares the content of the contact.json file as a variable called contact
 var product = require("./model/product.json");
@@ -43,10 +46,98 @@ app.get('/products', function(req, res){
   
 });
 
+// =####### Functions to add a contact #############
+
+app.get('/add', function(req, res){
+      res.render("add")
+     console.log("Welcome to leave comment page")
+    
+  
+});
 
 
 
+app.post('/add', function(req,res){
+    // Write a function to find the max id in my JSON file
+ 
+    function getMax(contacts, id) {
+        var max
+        for (var i=0; i<contacts.length; i++) {
+            if(!max || parseInt(contact[i][id]) > parseInt(max[id]))
+            max = contacts[i];
+        }
+        console.log("The max id is " + max)
+        return max;
 
+    }
+  
+
+    maxCid = getMax(contact, "id")
+    
+   var newId = maxCid.id + 1; // make a ne variable for id which is 1 larger than the current max
+    
+    console.log("New id is: " + newId);
+    var json = JSON.stringify(contact) // we tell the application to get our JSON readdy to modify
+    // Now we will create a new JSON object
+    
+    var contactsx = {
+        
+        name: req.body.name,
+        Comment: req.body.comment,
+        id: newId,
+        email: req.body.email
+        
+        
+    }
+    
+    
+    // Now we push the data back to the JSON file
+    
+    fs.readFile('./model/contact.json', 'utf8', function readfileCallback(err){
+        if(err){
+            throw(err)
+            
+        } else {
+            
+          contact.push(contactsx)  // add the new contact to the JSON file
+          json = JSON.stringify(contact, null, 4) // structure the new data nicely in the JSON file
+          fs.writeFile('./model/contact.json', json, 'utf8')
+        }
+        
+        
+    })
+    
+    res.redirect('/contacts')
+    
+});
+
+
+
+//// ########## Function to delete a contact ####
+
+app.get('/deletecontact/:id', function(req,res){
+    
+     var json = JSON.stringify(contact);
+     // Get the id we want to delete from the URL parameter 
+     var keyToFind = parseInt(req.params.id); 
+    
+    var data = contact // Declare the json file as a variable called data
+    
+    // lets map the data and find the information we need
+    var index = data.map(function(contact){return contact.id;}).indexOf(keyToFind)
+    
+    // JavaScript allows us to splice our JSON data
+    
+    contact.splice(index, 1); // delete only one item from the position of the index variable above
+    
+      
+          json = JSON.stringify(contact, null, 4) // structure the new data nicely in the JSON file
+          fs.writeFile('./model/contact.json', json, 'utf8')
+
+console.log("Ha Ha ....... its gone!")    
+res.redirect('/contacts')
+
+});
 
 
 
