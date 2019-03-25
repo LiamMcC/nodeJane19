@@ -20,7 +20,9 @@
                    <h1 class="itemp">Name: <%= contact.name %> </h1>
                     <h1 class="itemp">Email: <%= contact.email %> </h1>
                     <h1 class="itemp">Comment: <%= contact.Comment %> </h1>
+                   
 <a href="/deletecontact/<%= contact.id %>" class="button">Delete Me!</a>
+<a href="/editcontact/<%= contact.id %>" class="button">Edit Me!</a>
                     </div>
               </div>
               
@@ -36,3 +38,5 @@
 
 
 <% include ../partials/footer %>
+
+<!--  <image class="pimage" src="/<%= contact.Image %>"></image> -->

@@ -141,6 +141,23 @@ res.redirect('/contacts')
 
 
 
+// ################### render route to edit contact 
+
+
+app.get('/editcontact/:id', function(req,res){
+    
+    function chooseContact(indOne){
+        return indOne.id === parseInt(req.params.id)
+    }
+    
+    var indOne = contact.filter(chooseContact)
+    
+    
+    
+    res.render('editcontact', {res:indOne});
+    
+});
+
 
 
 
