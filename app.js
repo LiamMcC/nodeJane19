@@ -117,6 +117,7 @@ app.post('/add', function(req,res){
 
 app.get('/deletecontact/:id', function(req,res){
     
+  
      var json = JSON.stringify(contact);
      // Get the id we want to delete from the URL parameter 
      var keyToFind = parseInt(req.params.id); 
@@ -151,10 +152,40 @@ app.get('/editcontact/:id', function(req,res){
     }
     
     var indOne = contact.filter(chooseContact)
+     res.render('editcontact', {res:indOne});
+    
+});
+
+
+// ### post request to edit contact 
+
+app.post('/editcontact/:id', function(req,res){
+    
+    var json = JSON.stringify(contact);
+    
+    var keyToFind = parseInt(req.params.id);  // Find the data we need to edit
+    var data = contact // Declare the json file as a variable called data
+    var index = data.map(function(contact){return contact.id;}).indexOf(keyToFind) // map out data and find what we need
     
     
+   
+    var y = req.body.comment;
+    var z = parseInt(req.params.id)
     
-    res.render('editcontact', {res:indOne});
+    
+     contact.splice(index, 1, {
+         
+         name: req.body.name,
+         Comment: y,
+         id: z,
+         email: req.body.email
+         
+     });
+    
+    json = JSON.stringify(contact, null, 4);
+    fs.writeFile("./model/contact.json", json, 'utf8' );
+    
+    res.redirect("/contacts");
     
 });
 
