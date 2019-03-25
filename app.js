@@ -2,6 +2,11 @@ var express = require("express"); // This line calls the express framework to ac
 // invoke the express package into action from here
 var app = express();
 // *********** Never write anything above the express call line ****************
+
+// Call the sql middleware to action
+var mysql = require('mysql');
+
+
 app.set("view engine", "ejs");  // set default view engine
 var fs = require('fs');
 var bodyParser = require("body-parser");
@@ -19,6 +24,29 @@ app.use(express.static("script"));
 // Call the access to the images folder and allow content to be rendered
 app.use(express.static("images"));
 
+// create connectivity to sql Database
+
+// Sub these details for you own gear host database details
+const db = mysql.createConnection ({
+
+ 
+    
+});
+
+
+// Put some clarity on our connection status
+
+db.connect((err) => {
+     if(err){
+    console.log("The Connection Failed ....... Blame Liam");
+    }
+    else {
+        console.log("Yes the connection is great");
+    }
+ });
+
+
+
 app.get('/', function(req, res){ // this line will call a grt request on the / url of our application
   // Now we need the function to actually do something  
     //res.send("Hello January Class") // We will send a string response to the browser
@@ -28,6 +56,74 @@ app.get('/', function(req, res){ // this line will call a grt request on the / u
     console.log("The Message was sent and you made an app")
     
 });
+
+
+
+
+                                                    // ######## SQL DATA Starts HERE
+
+// create a route to create a database table
+
+//app.get('/createtable', function(req, res){
+    
+ //   let sql = 'CREATE TABLE liammc (Id int NOT NULL AUTO_INCREMENT PRIMARY KEY, Name varchar(255), Price int, Image varchar(255), Activity varchar(255));'
+    
+ //   let query = db.query(sql, (err,res) => {
+        
+ //       if(err) throw err;
+        
+        
+ //   });
+    
+//    res.send("SQL Worked");
+    
+    
+//});
+
+// Route to create a product by hardcode
+app.get('/createproduct', function(req, res){
+    let sql = 'INSERT INTO liammc (Name, Price, Image, Activity) VALUES ("POLAR M400", 199, "polarm400.png", "Running")'
+     let query = db.query(sql, (err,res) => {
+        if(err) throw err;
+    });
+    res.send("Product Created");
+ 
+});
+
+// Route to show all products from database 
+app.get('/productssql', function(req, res){
+    
+    let sql = 'SELECT * FROM liammc';
+    let query = db.query(sql, (err,res1) => {
+        
+        if(err) throw err;
+        
+        res.render('showallproducts', {res1})
+        
+    });
+    
+   // res.send("Product Created");
+    
+    
+});
+
+
+
+
+
+
+
+
+
+
+                                                    // ######## SQL DATA ENDS HERE
+
+
+
+
+
+
+                                                   // ### JSON DATA STARTS HERE
 
 // route to get comments page
 
