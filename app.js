@@ -18,6 +18,13 @@ var product = require("./model/product.json");
 // Call the access to the views folder and allow content to be rendered
 app.use(express.static("views"));
 
+
+// call the fileUpload middleware
+
+const fileUpload = require('express-fileupload');
+app.use(fileUpload());
+
+
 // Call the access to the script folder and allow content to be rendered
 app.use(express.static("script"));
 
@@ -27,14 +34,22 @@ app.use(express.static("images"));
 // create connectivity to sql Database
 
 // Sub these details for you own gear host database details
-const db = mysql.createConnection ({
-
+const db = mysql.createConnection({
  
-    
+ host: 'hostingmysql304.webapps.net',
+ user: 'liamme',
+ password: 'L1Am39??',
+ database: 'liam'
+  
+ 
 });
 
 
 // Put some clarity on our connection status
+
+
+
+
 
 db.connect((err) => {
      if(err){
@@ -107,10 +122,89 @@ app.get('/productssql', function(req, res){
     
 });
 
+// route to render create product page
+app.get('/createsql', function(req, res){
+    res.render('createsql')
+   
+    
+});
+
+// route to post new product 
+
+app.post('/createsql', function(req, res){
+    let sql = 'INSERT INTO liammc (Name, Price, Image, Activity) VALUES ("'+req.body.name+'", '+req.body.price+', "'+req.body.image+'", "'+req.body.activity+'")'
+     let query = db.query(sql, (err,res) => {
+        if(err) throw err;
+    });
+    res.redirect("/productssql");
+ 
+});
 
 
+// route to edit sql data 
+
+app.get('/edit/:id', function(req, res){
+  
+    let sql = 'SELECT * FROM liammc WHERE Id = "'+req.params.id+'" '
+    let query = db.query(sql, (err, res1) => {
+        if(err) throw err;
+        console.log(res1);
+        
+        
+        res.render('edit', {res1});
+        
+    });
+    
+});
 
 
+// Post request URL to edit product with SQL
+
+app.post('/editsql/:id', function(req, res){
+    
+       let sql = 'UPDATE liammc SET Name = "'+req.body.name+'", Price = '+req.body.price+', Image = "'+req.body.image+'", Activity = "'+req.body.activity+'" WHERE Id = "'+req.params.id+'"      '
+       let query = db.query(sql, (err,res) => {
+        if(err) throw err;
+    });
+    res.redirect("/productssql");
+    
+    
+});
+
+
+// route to delete sql product 
+
+app.get('/deletesql/:id', function(req, res){
+   
+   let sql = 'DELETE FROM liammc WHERE Id = '+req.params.id+' ' 
+   let query = db.query(sql, (err, res ) => {
+       if(err) throw err;
+  
+       
+   });
+   res.redirect("/productssql");
+    
+    
+});
+
+
+// route to show individual page 
+
+app.get('/show/:id', function(req, res){
+    
+    let sql = 'SELECT * FROM liammc WHERE Id = '+req.params.id+'';
+    let query = db.query(sql, (err,res1) => {
+        
+        if(err) throw err;
+        
+        res.render('show', {res1})
+        
+    });
+    
+   // res.send("Product Created");
+    
+    
+});
 
 
 
@@ -286,9 +380,58 @@ app.post('/editcontact/:id', function(req,res){
 });
 
 
+// post request url to search database and use an existing page (products) to display results
+
+app.post('/search', function(req, res){
+    
+    
+    
+    let sql = 'SELECT * FROM liammc WHERE Name LIKE  "%'+req.body.search+'%"  OR Activity LIKE  "%'+req.body.search+'%"    ';
+    let query = db.query(sql, (err,res1) => {
+        
+        if(err) throw err;
+        
+        res.render('showallproducts', {res1})
+        
+    });
+    
+   // res.send("Product Created");
+    
+    
+});
 
 
 
+// app to render image upload page
+
+app.get('/upload', function(req, res){
+    
+  res.render('upload')  
+    
+});
+
+
+// post request to upload an image - make sure you include the npm middleware at the top of the app.js file
+
+app.post('/upload', function(req, res){
+    
+ //    need to get the image from the form
+ 
+ let sampleFile = req.files.sampleFile
+  filename = sampleFile.name;
+ // we use the middleware (file upload ) to move the data from the form to the desired location
+    sampleFile.mv('./images/' + filename, function(err){
+        if(err)
+      
+        return res.status(500).send(err);
+        
+        console.log("Image is " + req.files.sampleFile)
+        
+        res.redirect('/');
+        
+    });
+    
+});
 
 
 // Now we set up a way for our application to run whe we need it to
